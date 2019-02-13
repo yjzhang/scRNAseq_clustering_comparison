@@ -160,6 +160,7 @@ plotTSNE(sce, colour_by = "total_features_by_counts", size_by = "total_counts")
 ## Save the normalized and cell filtered dataset
 
 ```{r save-data}
+gc()
 sce <- sce[!grepl("^ERCC", rownames(sce)), ]
 dim(sce)
 table(sce$phenoid)

@@ -94,7 +94,7 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) +
   theme_bw()
 
 colData(sce)$feature.drop <- isOutlier(sce$total_features_by_counts, nmads = 3, type = "lower", log = TRUE)
-ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_features_by_counts)) + 
   geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = min(sce$total_features_by_counts[!sce$feature.drop]), 

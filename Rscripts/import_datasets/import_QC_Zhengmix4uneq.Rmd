@@ -54,8 +54,15 @@ sce <- normalise(sce, exprs_values = "counts", return_log = TRUE) ## generates l
 Exclude features that are not expressed
 
 ```{r reduce-expression-matrix}
+rm(b.cells)
+rm(naive.cytotoxic)
+rm(cd14.monocytes)
+rm(regulatory.t)
+gc()
+gc()
 keep_features <- rowSums(counts(sce) > 0) > 0
 table(keep_features)
+gc()
 sce <- sce[keep_features, ]
 dim(sce)
 ```
@@ -101,7 +108,7 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) +
   theme_bw()
 
 colData(sce)$feature.drop <- isOutlier(sce$total_features_by_counts, nmads = 3, type = "lower", log = TRUE)
-ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
+ggplot(as.data.frame(colData(sce)), aes(x = total_features_by_counts)) + 
   geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
   ylab("Number of cells") + 
   geom_vline(xintercept = min(sce$total_features_by_counts[!sce$feature.drop]), 
@@ -156,6 +163,7 @@ plotTSNE(sce, colour_by = "total_features_by_counts", size_by = "total_counts")
 ## Save the normalized and cell filtered dataset
 
 ```{r save-data}
+gc()
 sce <- sce[!grepl("^ERCC", rownames(sce)), ]
 dim(sce)
 table(sce$phenoid)
