@@ -13,16 +13,17 @@ suppressPackageStartupMessages({
   library(scran)
   library(dplyr)
   library(ggplot2)
+  library(DropletUtils)
 })
 ```
 
 ## Load raw data
 
 ```{r load-dataset}
-b.cells <- read10XResults("../../data/data_raw/zheng/b_cells/filtered_matrices_mex/hg19") 
-naive.cytotoxic <- read10XResults("../../data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19")
-cd14.monocytes <- read10XResults("../../data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19")
-regulatory.t <- read10XResults("../../data/data_raw/zheng/regulatory_t/filtered_matrices_mex/hg19")
+b.cells <- read10xCounts("../../data/data_raw/zheng/b_cells/filtered_matrices_mex/hg19") 
+naive.cytotoxic <- read10xCounts("../../data/data_raw/zheng/naive_cytotoxic/filtered_matrices_mex/hg19")
+cd14.monocytes <- read10xCounts("../../data/data_raw/zheng/cd14_monocytes/filtered_matrices_mex/hg19")
+regulatory.t <- read10xCounts("../../data/data_raw/zheng/regulatory_t/filtered_matrices_mex/hg19")
 
 colnames(b.cells) <-  paste0("b.cells", seq_len(ncol(b.cells)))
 colnames(naive.cytotoxic) <- paste0("naive.cytotoxic", seq_len(ncol(naive.cytotoxic)))
@@ -99,11 +100,15 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) +
              color = "red", linetype = "dashed") + 
   theme_bw()
 
-colData(sce)$feature.drop <- isOutlier(sce$total_features, nmads = 3, type = "lower", log = TRUE)
-ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
+# TODO: this line has errors
+# the problem is that sce$total_features is NULL
+# this is caused by a scater update that broke names for some reason????????????
+# as far as I know, total_features is replaced by total_features_by_counts
+colData(sce)$feature.drop <- isOutlier(sce$total_features_by_counts, nmads = 3, type = "lower", log = TRUE)
+ggplot(as.data.frame(colData(sce)), aes(x = total_features_by_counts)) + 
   geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
   ylab("Number of cells") + 
-  geom_vline(xintercept = min(sce$total_features[!sce$feature.drop]), 
+  geom_vline(xintercept = min(sce$total_features_by_counts[!sce$feature.drop]), 
              color = "red", linetype = "dashed") + 
   theme_bw()
 ```
@@ -117,7 +122,7 @@ dim(sce)
 ## Quality control using highest expressed genes
 
 ```{r qc-filt}
-plotQC(sce, type = "highest-expression", n = 50)
+#plotQC(sce, type = "highest-expression", n = 50)
 ```
 
 ## Data normalization
@@ -137,10 +142,10 @@ sce <- normalise(sce, exprs_values = "counts", return_log = FALSE)
 ## Plot the proportion of explained variances
 
 ```{r explained-variance, warning = FALSE} 
-expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features", "pct_dropout",
+expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features_by_counts", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
-plotQC(sce, type = "explanatory-variables", variables = expl_vars)
+#plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 ```
 
 ## Plot t-SNE representations
@@ -149,7 +154,7 @@ plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 set.seed(1234)
 sce <- runTSNE(sce, exprs_values = "logcounts", perplexity = 10)
 plotTSNE(sce, colour_by = "phenoid")
-plotTSNE(sce, colour_by = "total_features", size_by = "total_counts")
+plotTSNE(sce, colour_by = "total_features_by_counts", size_by = "total_counts")
 ```
 
 ## Save the normalized and cell filtered dataset

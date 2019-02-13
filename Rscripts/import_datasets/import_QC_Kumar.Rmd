@@ -101,11 +101,11 @@ ggplot(as.data.frame(colData(sce)), aes(x = total_counts)) +
              color = "red", linetype = "dashed") + 
   theme_bw()
 
-colData(sce)$feature.drop <- isOutlier(sce$total_features, nmads = 3, type = "lower", log = TRUE)
+colData(sce)$feature.drop <- isOutlier(sce$total_features_by_counts, nmads = 3, type = "lower", log = TRUE)
 ggplot(as.data.frame(colData(sce)), aes(x = total_features)) + 
   geom_histogram(bins = 20, fill = "grey80") + xlab("Number of detected features") + 
   ylab("Number of cells") + 
-  geom_vline(xintercept = min(sce$total_features[!sce$feature.drop]), 
+  geom_vline(xintercept = min(sce$total_features_by_counts[!sce$feature.drop]), 
              color = "red", linetype = "dashed") + 
   theme_bw()
 
@@ -131,7 +131,7 @@ dim(sce)
 ## Quality control using highest expressed genes
 
 ```{r qc-filt}
-plotQC(sce, type = "highest-expression", n = 50)
+#plotQC(sce, type = "highest-expression", n = 50)
 ```
 
 ## Data normalization
@@ -150,10 +150,10 @@ sce <- normalise(sce, exprs_values = "counts", return_log = FALSE)
 ## Plot the proportion of explained variances
 
 ```{r explained-variance, warning = FALSE} 
-expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features", "pct_dropout",
+expl_vars <- c("phenoid", "log10_total_counts", "log10_total_features_by_counts", "pct_dropout",
                "pct_counts_top_200_features", "log10_counts_feature_controls",
                "pct_counts_feature_controls")
-plotQC(sce, type = "explanatory-variables", variables = expl_vars)
+#plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 ```
 
 ## Plot t-SNE representations
@@ -162,7 +162,7 @@ plotQC(sce, type = "explanatory-variables", variables = expl_vars)
 set.seed(1234)
 sce <- runTSNE(sce, exprs_values = "logcounts", perplexity = 10)
 plotTSNE(sce, colour_by = "phenoid")
-plotTSNE(sce, colour_by = "total_features", size_by = "total_counts")
+plotTSNE(sce, colour_by = "total_features_by_counts", size_by = "total_counts")
 ```
 
 ## Save the normalized and cell filtered dataset
