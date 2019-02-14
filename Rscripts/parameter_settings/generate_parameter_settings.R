@@ -330,3 +330,16 @@ for (f in filterings) {
           file = paste0("parameter_settings/sce_", f, "_", d, "_PCAHC.json"))
   }
 }
+
+## UNCURL parameters
+## -------------------------------------------------------------------------- ##
+## General
+write(toJSON(list()), file = "parameter_settings/uncurl.json")
+
+## Dataset-specific
+for (f in filterings) {
+  for (d in datasets) {
+    write(toJSON(list()), 
+          file = paste0("parameter_settings/sce_", f, "_", d, "_uncurl.json"))
+  }
+}

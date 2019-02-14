@@ -25,7 +25,10 @@ If you want to reproduce the results of our study, you need to go through the st
 - Modify the `R` and `Rscript` variables in the top of the [Makefile](Makefile) to point to the version of `R` that you want to use.
 - Install the necessary `R` packages and dependencies:
 
+Requires libgsl-dev to be installed. (`sudo apt-get install libgsl-dev`)
+
 ```
+install.packages("remotes")
 install.packages("BiocManager")
 BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr", 
                        "tidyr", "VCCRI/CIDR", 
@@ -42,7 +45,7 @@ BiocManager::install(c("RColorBrewer", "ggplot2", "dplyr",
                        "MultiAssayExperiment", "rjson", 
                        "hadley/multidplyr",
                        "mclust", "ape", "clusterExperiment", 
-                       "csoneson/countsimQC", "monocle"))
+                       "csoneson/countsimQC", "monocle", "DropletUtils"))
 ```
 
 - If you want to include RaceID2, download the `RaceID2_StemID_class.R` script from [https://github.com/dgrun/StemID](https://github.com/dgrun/StemID) (we used the version from March 3, 2017) and place it in the [Rscripts/clustering](Rscripts/clustering) directory. 
